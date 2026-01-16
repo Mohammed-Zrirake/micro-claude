@@ -178,7 +178,7 @@ generate_prompt() {
     cat <<EOF
 # Build Iteration for: $TASK_NAME
 
-You are implementing tasks from a PRD in an autonomous loop. Each iteration you complete ONE task, then exit.
+You are implementing tasks from a PRD in an autonomous loop. Each iteration you complete tasks, then exit.
 
 ## Context Files
 - Task directory: $task_dir/
@@ -186,25 +186,45 @@ You are implementing tasks from a PRD in an autonomous loop. Each iteration you 
 - Tasks (PRD): $task_dir/prd.json
 - Notes (history): $task_dir/notes.md
 
-## Your Mission (ONE task only)
+## Your Mission
 
 ### Step 1: Load Context
 1. Read \`$task_dir/prd.json\` to see all tasks
 2. Read \`$task_dir/notes.md\` to understand what's been done
-3. Find the FIRST task where \`"done": false\`
+3. Find ALL tasks where \`"done": false\`
 
-### Step 2: Understand the Task
+### Step 2: Assess and Batch Tasks
+Review pending tasks and decide how many to tackle this iteration:
+
+**Batch multiple tasks when:**
+- Tasks are simple (add a field, create a type, write a config)
+- Tasks touch the same file or area
+- Tasks are independent and low-risk
+- Combined effort feels like <15 min of work
+
+**Do ONE task when:**
+- Task is complex (new feature, significant logic)
+- Task requires research or exploration
+- Task has many unknowns or dependencies
+- Task involves testing/debugging
+
+Aim for 2-5 simple tasks per batch, or 1 complex task. Don't overload - fresh context is cheap.
+
+### Step 3: Understand Tasks
+For each task you're doing:
 1. Get the \`from\` and \`to\` line numbers from the task
 2. Read those specific lines from \`$task_dir/plan.md\`
 3. This gives you the detailed requirements
 
-### Step 3: Implement
+### Step 4: Implement
 1. Search the codebase first - don't assume code doesn't exist
 2. Follow existing patterns in the codebase
-3. Implement exactly what the task describes
+3. Implement exactly what each task describes
 4. Run tests if applicable
 
-### Step 4: Update State
+### Step 5: Update State
+For EACH completed task:
+
 1. Append to \`$task_dir/notes.md\`:
    \`\`\`markdown
    ## Task #[id]: [title]
@@ -218,15 +238,16 @@ You are implementing tasks from a PRD in an autonomous loop. Each iteration you 
 2. Update \`$task_dir/prd.json\`:
    - Set this task's \`"done": true\`
 
-### Step 5: Exit
-After completing ONE task, exit. The loop will restart with fresh context.
+### Step 6: Exit
+After completing your task(s), exit. The loop will restart with fresh context.
 
 ## Rules
-- Complete exactly ONE task per iteration
+- Batch simple tasks, isolate complex ones
 - Always search before assuming code doesn't exist
 - Follow existing code patterns
 - If blocked, note the blocker in notes.md and still mark done
 - Keep notes concise but informative
+- Don't exceed ~5 tasks per iteration even if they're simple
 
 ## Current Iteration: $((ITERATION + 1))
 EOF
