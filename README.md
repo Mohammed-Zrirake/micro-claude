@@ -23,22 +23,65 @@ The quality of your implementation depends entirely on the quality of your plan.
 
 A detailed plan means fewer mistakes, less back-and-forth, and better results.
 
-## Ralph Loop Integration
+## Ralph Loop (Autonomous Implementation)
 
-Micro-Claude works seamlessly with the [Ralph Loop plugin](https://github.com/ayoubben18/ralph-loop). After creating your plan and exploding tasks:
+Micro-Claude includes `ralph.sh` - an autonomous implementation loop based on the [Ralph Wiggum technique](https://ghuntley.com/ralph/). Unlike `/mc:implement` which runs in a single session, Ralph runs each task in a **fresh context window**, avoiding the quality degradation that comes from context accumulation.
+
+### Why Ralph?
+
+| `/mc:implement` | `ralph.sh` |
+|-----------------|------------|
+| Single context window | Fresh context per task |
+| Quality degrades over time | Stays in "smart zone" |
+| Interactive (requires approval) | Fully autonomous |
+| Good for small task sets | Great for 20+ tasks |
+
+### Usage
 
 ```bash
-# 1. Create detailed plan
-/mc:interrogate
+# List available tasks
+./ralph.sh
 
-# 2. Explode into tasks
-/mc:explode
+# Run autonomous loop on a specific task
+./ralph.sh my-feature
 
-# 3. Start Ralph Loop for autonomous implementation
-/ralph-loop
+# Limit to 20 iterations
+./ralph.sh my-feature 20
 ```
 
-Ralph will continuously loop through tasks, implementing them one by one with full context from your detailed plan. The more detailed your `plan.md`, the better Ralph performs - it uses the line references to read exactly what it needs for each task.
+### How It Works
+
+```
+┌─────────────────────────────────────────────────┐
+│  ./ralph.sh my-feature                          │
+└─────────────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────────────┐
+│  Check: Any pending tasks in prd.json?          │
+│  ├─ No  → Exit with success                     │
+│  └─ Yes → Continue                              │
+└─────────────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────────────┐
+│  Run Claude with fresh context                  │
+│  → Picks next pending task                      │
+│  → Implements it                                │
+│  → Updates notes.md and prd.json                │
+│  → Exits                                        │
+└─────────────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────────────┐
+│  Loop restarts → Fresh context for next task    │
+└─────────────────────────────────────────────────┘
+```
+
+### Requirements
+
+- `jq` - JSON processor (`brew install jq` or `apt install jq`)
+- `claude` CLI - (`npm install -g @anthropic-ai/claude-code`)
 
 ## Installation
 
@@ -161,9 +204,9 @@ Extends, modifies, or fixes an existing plan and PRD through interactive dialogu
 /mc:explode
 # → Creates .micro-claude/my-feature/prd.json
 
-# 3. Implement
-/mc:implement
-# → Implements tasks, updates notes.md, marks done
+# 3. Implement (choose one)
+./ralph.sh my-feature     # Autonomous (recommended for 20+ tasks)
+/mc:implement             # Interactive (good for small task sets)
 
 # 4. Forgot something? Mutate the plan
 /mc:mutate

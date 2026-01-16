@@ -94,13 +94,23 @@ async function install() {
       log('✅ Created .micro-claude directory', COLORS.green);
     }
 
+    // Copy ralph.sh script
+    const ralphSource = path.join(__dirname, 'ralph.sh');
+    const ralphDest = path.join(targetDir, 'ralph.sh');
+    if (fs.existsSync(ralphSource)) {
+      fs.copyFileSync(ralphSource, ralphDest);
+      fs.chmodSync(ralphDest, '755'); // Make executable
+      log('✅ Installed ralph.sh (autonomous loop)', COLORS.green);
+    }
+
     log('\n✨ Micro-Claude installed successfully!', COLORS.bright + COLORS.green);
 
     log('\n📋 Workflow:', COLORS.cyan);
     log('1. /mc:interrogate  → Creates detailed plan.md', COLORS.white);
     log('2. /mc:mini-explode → Explodes into high-level tasks', COLORS.white);
     log('   /mc:explode      → Explodes into atomic tasks', COLORS.white);
-    log('3. /mc:implement    → Implements tasks with notes', COLORS.white);
+    log('3. ./ralph.sh <task> → Autonomous implementation (recommended)', COLORS.white);
+    log('   /mc:implement    → Interactive implementation', COLORS.white);
     log('4. /mc:mutate       → Extend or modify the plan', COLORS.white);
 
     log('\n📁 Files created per task:', COLORS.cyan);
@@ -135,8 +145,12 @@ if (!command || command === 'install') {
   log('  /mc:interrogate   Deep user interrogation to create plan');
   log('  /mc:mini-explode  Explode plan into high-level tasks');
   log('  /mc:explode       Explode plan into atomic tasks');
-  log('  /mc:implement     Implement tasks with notes tracking');
+  log('  /mc:implement     Interactive task implementation');
   log('  /mc:mutate        Extend or modify existing plans');
+  log('\nRalph Loop (autonomous):', COLORS.yellow);
+  log('  ./ralph.sh              List tasks and select interactively');
+  log('  ./ralph.sh <task>       Run autonomous loop on task');
+  log('  ./ralph.sh <task> 20    Run with max 20 iterations');
   log('\nMore info: https://github.com/ayoubben18/micro-claude', COLORS.blue);
 } else if (command === '--version' || command === '-v') {
   const packageJson = require('./package.json');
