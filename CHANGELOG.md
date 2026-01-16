@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/ayoubben18/micro-claude/compare/v1.1.0...v1.2.0) (2026-01-16)
+
+
+### Features
+
+* add ralph.sh autonomous implementation loop ([5521189](https://github.com/ayoubben18/micro-claude/commit/55211890bf360f63216bac9bfde0b6cbf9c624df))
+
 # [1.1.0](https://github.com/ayoubben18/micro-claude/compare/v1.0.0...v1.1.0) (2026-01-16)
 
 
