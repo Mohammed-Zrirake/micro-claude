@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/ayoubben18/micro-claude/compare/v1.3.0...v1.4.0) (2026-01-16)
+
+
+### Features
+
+* **ralph:** allow batching of simple tasks per iteration ([d27cead](https://github.com/ayoubben18/micro-claude/commit/d27cead686c40e14db4e726a5184711fd6b2d8a8))
+
 # [1.3.0](https://github.com/ayoubben18/micro-claude/compare/v1.2.0...v1.3.0) (2026-01-16)
 
 
