@@ -86,6 +86,26 @@ Implements tasks in a loop while maintaining notes.
 6. Marks task as `done` in `prd.json`
 7. Loops or exits
 
+### `/mc:mutate`
+
+Extends, modifies, or fixes an existing plan and PRD through interactive dialogue.
+
+**Use when:**
+- You forgot to include something in the original plan
+- Requirements changed and you need to update the spec
+- You discovered a mistake that needs correction
+- A section needs more detail or clarification
+
+**Flow:**
+1. Loads existing `plan.md`, `prd.json`, and `notes.md`
+2. Shows current state summary
+3. Asks what you want to change (add/modify/remove/fix/clarify)
+4. Asks targeted follow-up questions based on change type
+5. Shows proposed changes with before/after comparison
+6. Applies changes to all artifacts
+7. Logs mutation in `notes.md` for traceability
+8. Loops until you're done making changes
+
 ## File Structure
 
 ```
@@ -144,6 +164,11 @@ Implements tasks in a loop while maintaining notes.
 # 3. Implement
 /mc:implement
 # → Implements tasks, updates notes.md, marks done
+
+# 4. Forgot something? Mutate the plan
+/mc:mutate
+# → Add/modify/remove requirements interactively
+# → Updates plan.md, prd.json, and notes.md
 ```
 
 ## License
