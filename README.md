@@ -91,6 +91,33 @@ npx micro-claude
 
 This installs the slash commands in your project's `.claude/commands/` directory.
 
+## 🤖 Gemini Support (New!)
+
+Micro-Claude now supports **Google Gemini** as a drop-in replacement for Claude.
+
+**Comparison:**
+- **Claude** (Default): Requires `claude` CLI and paid Anthropic API.
+- **Gemini**: Can use Free Tier, official `gemini` CLI integration, and huge context window.
+
+### Setup for Gemini
+
+1. **Install Official CLI**: `npm install -g @google/gemini-cli`
+2. **Configure Auth**:
+   - **Option A (Recommended)**: Run `gemini auth` to login globally.
+   - **Option B**: Copy `.env.example` to `.env` and add your `GOOGLE_API_KEY`.
+3. **Run**: Use the Gemini wrappers instead of Claude commands.
+
+```bash
+# Interactive Mode
+node gemini-interact.js interrogate
+
+# Autonomous Loop (Ralph)
+export MC_PROVIDER=gemini
+./ralph.sh <task-name>
+```
+
+See [Gemini_Support.md](Gemini_Support.md) for full documentation.
+
 ## Commands
 
 ### `/mc:interrogate`

@@ -25,8 +25,11 @@ NC='\033[0m' # No Color
 
 # Configuration
 MICRO_CLAUDE_DIR=".micro-claude"
+MICRO_CLAUDE_DIR=".micro-claude"
 DEFAULT_MAX_ITERATIONS=50
 ITERATION=0
+# Default provider is claude, can be set to "gemini" via env var MC_PROVIDER
+PROVIDER="${MC_PROVIDER:-claude}"
 
 # Print colored output
 log() {
@@ -38,6 +41,13 @@ print_header() {
     echo ""
     log "╔══════════════════════════════════════════════════════════════╗" "$CYAN"
     log "║           Ralph Loop - Micro-Claude Implementation           ║" "$CYAN"
+    log "╚══════════════════════════════════════════════════════════════╝" "$CYAN"
+    echo ""
+print_header() {
+    echo ""
+    log "╔══════════════════════════════════════════════════════════════╗" "$CYAN"
+    log "║           Ralph Loop - Micro-Claude Implementation           ║" "$CYAN"
+    log "║               Provider: ${PROVIDER^^}                          ║" "$CYAN"
     log "╚══════════════════════════════════════════════════════════════╝" "$CYAN"
     echo ""
 }
@@ -53,6 +63,37 @@ check_dependencies() {
     if ! command -v claude &> /dev/null; then
         log "Error: claude CLI is required but not installed." "$RED"
         log "Install it with: npm install -g @anthropic-ai/claude-code" "$YELLOW"
+        exit 1
+    fi
+# Check dependencies
+check_dependencies() {
+    if ! command -v jq &> /dev/null; then
+        log "Error: jq is required but not installed." "$RED"
+        log "Install it with: brew install jq (macOS) or apt install jq (Linux)" "$YELLOW"
+        exit 1
+    fi
+
+    if [ "$PROVIDER" == "claude" ]; then
+        if ! command -v claude &> /dev/null; then
+            log "Error: claude CLI is required for 'claude' provider but not installed." "$RED"
+            log "Install it with: npm install -g @anthropic-ai/claude-code" "$YELLOW"
+            exit 1
+        fi
+    elif [ "$PROVIDER" == "gemini" ]; then
+         if ! command -v node &> /dev/null; then
+            log "Error: node is required for 'gemini' provider but not installed." "$RED"
+            exit 1
+        fi
+        if [ ! -f "gemini-runner.js" ]; then
+             log "Error: gemini-runner.js not found in current directory." "$RED"
+             exit 1
+        fi
+        if [ -z "$GOOGLE_API_KEY" ]; then
+             log "Error: GOOGLE_API_KEY environment variable is required for Gemini provider." "$RED"
+             exit 1
+        fi
+    else
+        log "Error: Unknown provider '$PROVIDER'. Use 'claude' or 'gemini'." "$RED"
         exit 1
     fi
 }
@@ -262,8 +303,14 @@ run_iteration() {
     log "────────────────────────────────────────────────────────────────" "$BLUE"
     echo ""
 
-    # Run Claude with fresh context
-    echo "$prompt" | claude -p --dangerously-skip-permissions
+    # Run with appropriate provider
+    if [ "$PROVIDER" == "gemini" ]; then
+         # Rate limit sleep for free tier (ensure we don't hit 15 RPM too hard if checks are fast)
+         sleep 4 
+         echo "$prompt" | node gemini-runner.js
+    else
+         echo "$prompt" | claude -p --dangerously-skip-permissions
+    fi
 
     local exit_code=$?
 
